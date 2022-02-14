@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: 
+  Creates two Route53 DNS records. One for the HarperDB API and another for HarperDB Custom Functions.
+Parameters:
+  HostedZoneId:
+    Description: Route53 zone ID
+    Type: String
+  Fqdn:
+    Description: FQDN for HarperDB API
+    Type: String
+  FqdnCf:
+    Description: FQDN for HarperDB Custom Functions
+    Type: String
+  CarrierIP:
+    Description: The carrier IP address given to the EC2 instance
+    Type: String
+Resources:
+  RecordSet:
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      Name: !Ref Fqdn
+      Type: "A"
+      HostedZoneId: !Ref HostedZoneId
+      ResourceRecords: 
+      - !Ref CarrierIP
+      TTL: "300"
+  RecordSetCf:
+    Type: "AWS::Route53::RecordSet"
+    Properties:
+      Name: !Ref FqdnCf
+      Type: "A"
+      HostedZoneId: !Ref HostedZoneId
+      ResourceRecords: 
+      - !Ref CarrierIP
+      TTL: "300"

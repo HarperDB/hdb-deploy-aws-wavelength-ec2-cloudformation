@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description:
+  Creates an VPC, a carrier gateway, a subnet in a Wavelength Zone, and a route table for the subnet.
+Parameters:
+  VPCCidrBlock:
+    Description: VPC CIDR block
+    Type: String
+    Default: 10.0.0.0/16
+  AvailabilityZone:
+    Description: Wavelength Zone
+    Type: AWS::EC2::AvailabilityZone::Name
+    Default: us-west-2-wl1-den-wlz-1
+  SubnetCidrBlock:
+    Description: Subnet CIDR block
+    Type: String
+    Default: 10.0.0.0/24
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VPCCidrBlock
+  CarrierGateway:
+    Type: AWS::EC2::CarrierGateway
+    Properties:
+      VpcId: !Ref VPC
+  Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Ref AvailabilityZone
+      CidrBlock: !Ref SubnetCidrBlock
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+  Route:
+    Type: AWS::EC2::Route
+    DependsOn: CarrierGateway
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      CarrierGatewayId: !Ref CarrierGateway
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref Subnet
+      RouteTableId: !Ref RouteTable
